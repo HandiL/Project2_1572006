@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Project2_1572006</string>
+    <string name="username">UserName</string>
+    <string name="password">Password</string>
+    <string name="stock">Stock</string>
+    <string name="hargaJual">Selling Price</string>
+    <string name="barang">Barang</string>
+    <string name="hargaBeli">Purchase Price</string>
+    <string name="nama">Name</string>
+    <string name="rePass">RePassword</string>
+    <string name="role">Role</string>
+    <string name="add">Add</string>
+    <string name="user">User</string>
+    <string name="logout">Logout</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="alamat">Address</string>
+    <string name="parcel_barang" translatable="false">parcel_barang</string>
+    <string name="parcel_user" translatable="false">parcel_user</string>
+    <string name="noTelp">Phone Number</string>
+    <string name="login">Login</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_kasir">Kasir</string>
+    <string name="nav_laporan">Laporan</string>
+    <string name="nav_user">User</string>
+    <string name="nav_barang">Barang</string>
+</resources>
