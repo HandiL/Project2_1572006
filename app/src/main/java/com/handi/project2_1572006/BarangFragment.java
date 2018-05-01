@@ -38,10 +38,10 @@ public class BarangFragment extends Fragment {
 
     final static String ARG_Barang = "parcel_barang";
     private DatabaseReference db;
-    boolean addData;
+    boolean addData,updateData,deleteData;
     int id;
     private  MainActivity mainActivity;
-
+    public Barang selectedBarang;
     public BarangFragment() {
     }
 
@@ -50,6 +50,8 @@ public class BarangFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         db = FirebaseDatabase.getInstance().getReference();
         addData=false;
+        updateData=false;
+        deleteData=false;
         View view = inflater.inflate(R.layout.fragment_barang,container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -66,6 +68,7 @@ public class BarangFragment extends Fragment {
             txtHargaJual.setText(String.valueOf(barang.getHargaJual()));
             txtHargaBeli.setText(String.valueOf(barang.getHargaBeli()));
             txtStock.setText(String.valueOf(barang.getStock()));
+            selectedBarang=barang;
         }
     }
     ///
@@ -111,5 +114,46 @@ public class BarangFragment extends Fragment {
                 });
         }
     }
-    ////
+
+    @OnClick(R.id.btnUpdate)
+    public void updateBarang(){
+        if(!TextUtils.isEmpty(txtHargaBeli.getText()) && !TextUtils.isEmpty(txtHargaJual.getText()) && !TextUtils.isEmpty(txtNamaBarang.getText())
+                && !TextUtils.isEmpty(txtStock.getText()))
+        {
+            selectedBarang.setStock(Integer.valueOf(txtStock.getText().toString()));
+            selectedBarang.setNamaBarang(txtNamaBarang.getText().toString());
+            selectedBarang.setHargaJual(Integer.valueOf(txtHargaJual.getText().toString()));
+            selectedBarang.setHargaBeli(Integer.valueOf(txtHargaBeli.getText().toString()));
+           db.child("Barang").child(selectedBarang.getIdBarang()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+               @Override
+               public void onSuccess(Void aVoid) {
+                   txtHargaBeli.setText("");
+                   txtHargaJual.setText("");
+                   txtNamaBarang.setText("");
+                   txtStock.setText("");
+                   updateData = true;
+                   Toast.makeText(getActivity(), "Update Barang Success", Toast.LENGTH_SHORT).show();
+               }
+           });
+
+        }
+
+    }
+    @OnClick(R.id.btnDelete)
+    public void deleteBarang(){
+        if(selectedBarang!=null)
+        {
+            db.child("Barang").child(selectedBarang.getIdBarang()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtHargaBeli.setText("");
+                    txtHargaJual.setText("");
+                    txtNamaBarang.setText("");
+                    txtStock.setText("");
+                    deleteData=true;
+                    Toast.makeText(getActivity(), "Delete Barang Success", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 }
