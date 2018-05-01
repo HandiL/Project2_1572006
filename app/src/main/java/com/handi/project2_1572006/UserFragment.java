@@ -59,9 +59,10 @@ public class UserFragment extends Fragment {
     @BindView(R.id.rbKasir)
     RadioButton rbKasir;
 
+    public User selectedUser;
     final static String ARG_User = "parcel_user";
     private DatabaseReference db;
-    boolean addData;
+    boolean addData,updateData,deleteData;
     int id;
     private  MainActivity mainActivity;
 
@@ -78,6 +79,17 @@ public class UserFragment extends Fragment {
             txtNama.setText(user.getNamaUser());
             txtNoTelp.setText(user.getNoTelpUser());
             txtUserName.setText(user.getUsername());
+            txtRePass.setText(user.getPassword());
+
+            if(user.getAdmin()==0)
+            {
+                rbKasir.setChecked(true);
+            }
+            else{
+                rbAdmin.setChecked(true);
+            }
+            selectedUser = user;
+
         }
     }
 
@@ -86,6 +98,9 @@ public class UserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         db = FirebaseDatabase.getInstance().getReference();
         addData=false;
+        updateData = false;
+        deleteData = false;
+        id=0;
         View view = inflater.inflate(R.layout.fragment_user,container,false);
         ButterKnife.bind(this,view);
         return view;
@@ -94,14 +109,11 @@ public class UserFragment extends Fragment {
 
     @OnClick(R.id.btnAdd)
     public void addUser(){
-        id=0;
         if(!TextUtils.isEmpty(txtUserName.getText()) && !TextUtils.isEmpty(txtAlamat.getText()) && !TextUtils.isEmpty(txtNama.getText())
                 && !TextUtils.isEmpty(txtPassword.getText()) && !TextUtils.isEmpty(txtNoTelp.getText()) && !TextUtils.isEmpty(txtRePass.getText()))
         {
             if(txtPassword.getText().toString().equals(txtRePass.getText().toString()))
             {
-
-
                 db.child("User").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -120,7 +132,13 @@ public class UserFragment extends Fragment {
 
                 User user = new User();
                 user.setIdUser("00"+String.valueOf((id+1)));
-                user.setAdmin(1);
+                if(rbKasir.isChecked())
+                {
+                    user.setAdmin(0);
+                }
+                else{
+                    user.setAdmin(1);
+                }
                 user.setAlamatUser(txtAlamat.getText().toString());
                 user.setNamaUser(txtNama.getText().toString());
                 user.setNoTelpUser(txtNoTelp.getText().toString());
@@ -142,9 +160,71 @@ public class UserFragment extends Fragment {
             }
             else
             {
-                Toast.makeText(getActivity(), "Passwod and RePassword ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Password and RePassword Must Be Same ", Toast.LENGTH_SHORT).show();
             }
 
         }
     }
+
+    ////
+    @OnClick(R.id.btnUpdate)
+    public void updateUser(){
+        if(!TextUtils.isEmpty(txtUserName.getText()) && !TextUtils.isEmpty(txtAlamat.getText()) && !TextUtils.isEmpty(txtNama.getText())
+                && !TextUtils.isEmpty(txtPassword.getText()) && !TextUtils.isEmpty(txtNoTelp.getText()) && !TextUtils.isEmpty(txtRePass.getText()))
+        {
+            selectedUser.setAlamatUser(txtAlamat.getText().toString());
+            selectedUser.setNamaUser(txtNama.getText().toString());
+            selectedUser.setPassword(txtPassword.getText().toString());
+            selectedUser.setNoTelpUser(txtNoTelp.getText().toString());
+            selectedUser.setUsername(txtUserName.getText().toString());
+            if(rbKasir.isChecked())
+            {
+                selectedUser.setAdmin(0);
+            }
+            else{
+                selectedUser.setAdmin(1);
+            }
+            db.child("User").child(selectedUser.getIdUser()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtNama.setText("");
+                    txtAlamat.setText("");
+                    txtPassword.setText("");
+                    txtUserName.setText("");
+                    txtNoTelp.setText("");
+                    txtRePass.setText("");
+                    updateData = true;
+                    Toast.makeText(getActivity(), "Update User Success", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+    }
+    @OnClick(R.id.btnDelete)
+    public void deleteUser(){
+        if(selectedUser!=null)
+        {
+            db.child("User").child(selectedUser.getIdUser()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtNama.setText("");
+                    txtAlamat.setText("");
+                    txtPassword.setText("");
+                    txtUserName.setText("");
+                    txtNoTelp.setText("");
+                    txtRePass.setText("");
+                    deleteData=true;
+                    Toast.makeText(getActivity(), "Delete User Success", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+
+
+
+
+
+    ////
 }
