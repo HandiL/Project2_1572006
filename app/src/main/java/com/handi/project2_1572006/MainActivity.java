@@ -34,10 +34,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,UserAdapter.UserDataListener,BarangAdapter.BarangDataListener {
 
-    private DatabaseReference userRef;
-    private ArrayList<User> users;
-    private ArrayList<Barang> barangs;
-
     private UserAdapter userAdapter;
     private UserListFragment userListFragment;
 
@@ -69,8 +65,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        users = new ArrayList<>();
-        barangs = new ArrayList<>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,8 +90,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        populateBarangData();
-        populateUserData();
     }
 
     @Override
@@ -148,22 +140,14 @@ public class MainActivity extends AppCompatActivity
             UserFragment userFragment = new UserFragment();
             FragmentTransaction userTransaction = getSupportFragmentManager().beginTransaction();
             userTransaction.replace(R.id.leftFrame, userFragment);
+            userTransaction.replace(R.id.rightFrame, getUserListFragment());
             userTransaction.commit();
-
-            FragmentTransaction userListTransaction = getSupportFragmentManager().beginTransaction();
-            userListTransaction.replace(R.id.rightFrame, getUserListFragment());
-            userListTransaction.commit();
-            populateUserData();
         } else if (id == R.id.nav_barang) {
             BarangFragment barangFragment = new BarangFragment();
             FragmentTransaction barangTransaction = getSupportFragmentManager().beginTransaction();
             barangTransaction.replace(R.id.leftFrame, barangFragment);
+            barangTransaction.replace(R.id.rightFrame, getBarangListFragment());
             barangTransaction.commit();
-
-            FragmentTransaction barangLisTransaction = getSupportFragmentManager().beginTransaction();
-            barangLisTransaction.replace(R.id.rightFrame, getBarangListFragment());
-            barangLisTransaction.commit();
-            populateBarangData();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,51 +171,6 @@ public class MainActivity extends AppCompatActivity
         return barangAdapter;
     }
 
-    public void populateUserData(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        userRef = database.getReference();
-        userRef.child("User").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                users.clear();
-                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
-                    User user = new User(noteDataSnapshot.getValue(User.class));
-                    System.out.println(user.toString());
-                    users.add(user);
-                }
-                getUserAdapter().setUsers(users);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
-            }
-        });
-        getUserListFragment().getUserAdapter().setUsers(users);
-    }
-    public void populateBarangData(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        userRef = database.getReference();
-        userRef.child("Barang").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                barangs.clear();
-                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
-                    Barang barang = new Barang(noteDataSnapshot.getValue(Barang.class));
-                    System.out.println(barang.toString());
-                    barangs.add(barang);
-                }
-                getBarangAdapter().setBarangs(barangs);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
-            }
-        });
-        getBarangListFragment().getBarangAdapter().setBarangs(barangs);
-    }
-
     @Override
     public void onBarangClicked(Barang barang) {
         if(findViewById(R.id.leftFrame)!=null){
@@ -242,6 +181,7 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.leftFrame,barangFragment);
             transaction.commit();
+
         }
         else
         {

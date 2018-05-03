@@ -12,9 +12,19 @@ public class Barang implements Parcelable{
     private String idBarang;
     private String namaBarang;
     private int stock;
+    private String key;
 
     public Barang() {
     }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public Barang(Barang barang) {
         this.idBarang = barang.getIdBarang();
         this.hargaJual = barang.getHargaJual();

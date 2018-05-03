@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -59,12 +60,19 @@ public class UserFragment extends Fragment {
     @BindView(R.id.rbKasir)
     RadioButton rbKasir;
 
+    @BindView(R.id.btnDelete)
+    Button btnDelete;
+
+    @BindView(R.id.btnUpdate)
+    Button btnUpdate;
+
+    @BindView(R.id.btnAdd)
+    Button btnAdd;
+
     public User selectedUser;
     final static String ARG_User = "parcel_user";
     private DatabaseReference db;
-    boolean addData,updateData,deleteData;
     int id;
-    private  MainActivity mainActivity;
 
     public UserFragment() {
     }
@@ -89,20 +97,28 @@ public class UserFragment extends Fragment {
                 rbAdmin.setChecked(true);
             }
             selectedUser = user;
-
+            updateMode();
         }
+    }
+    public void updateMode(){
+        btnAdd.setEnabled(false);
+        btnDelete.setEnabled(true);
+        btnUpdate.setEnabled(true);
+    }
+    public void addMode(){
+        btnAdd.setEnabled(true);
+        btnDelete.setEnabled(false);
+        btnUpdate.setEnabled(false);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         db = FirebaseDatabase.getInstance().getReference();
-        addData=false;
-        updateData = false;
-        deleteData = false;
         id=0;
         View view = inflater.inflate(R.layout.fragment_user,container,false);
         ButterKnife.bind(this,view);
+        addMode();
         return view;
     }
 
@@ -129,7 +145,6 @@ public class UserFragment extends Fragment {
                         System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
                     }
                 });
-
                 User user = new User();
                 user.setIdUser("00"+String.valueOf((id+1)));
                 if(rbKasir.isChecked())
@@ -153,7 +168,6 @@ public class UserFragment extends Fragment {
                         txtNoTelp.setText("");
                         txtUserName.setText("");
                         txtRePass.setText("");
-                        addData = true;
                         Toast.makeText(getActivity(), "Add User Success", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -184,7 +198,7 @@ public class UserFragment extends Fragment {
             else{
                 selectedUser.setAdmin(1);
             }
-            db.child("User").child(selectedUser.getIdUser()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+            db.child("User").child(selectedUser.getKey()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtNama.setText("");
@@ -193,11 +207,10 @@ public class UserFragment extends Fragment {
                     txtUserName.setText("");
                     txtNoTelp.setText("");
                     txtRePass.setText("");
-                    updateData = true;
                     Toast.makeText(getActivity(), "Update User Success", Toast.LENGTH_SHORT).show();
                 }
             });
-
+            addMode();
         }
 
     }
@@ -205,7 +218,7 @@ public class UserFragment extends Fragment {
     public void deleteUser(){
         if(selectedUser!=null)
         {
-            db.child("User").child(selectedUser.getIdUser()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            db.child("User").child(selectedUser.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtNama.setText("");
@@ -214,17 +227,11 @@ public class UserFragment extends Fragment {
                     txtUserName.setText("");
                     txtNoTelp.setText("");
                     txtRePass.setText("");
-                    deleteData=true;
                     Toast.makeText(getActivity(), "Delete User Success", Toast.LENGTH_SHORT).show();
                 }
             });
+            addMode();
         }
     }
 
-
-
-
-
-
-    ////
 }

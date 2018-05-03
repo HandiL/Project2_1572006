@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -29,18 +30,28 @@ import butterknife.OnClick;
 public class BarangFragment extends Fragment {
     @BindView(R.id.txtNamaBarang)
     EditText txtNamaBarang;
+
     @BindView(R.id.txtHargaJual)
     EditText txtHargaJual;
+
     @BindView(R.id.txtHargaBeli)
     EditText txtHargaBeli;
+
     @BindView(R.id.txtStock)
     EditText txtStock;
 
+    @BindView(R.id.btnDelete)
+    Button btnDelete;
+
+    @BindView(R.id.btnUpdate)
+    Button btnUpdate;
+
+    @BindView(R.id.btnAdd)
+    Button btnAdd;
+
     final static String ARG_Barang = "parcel_barang";
     private DatabaseReference db;
-    boolean addData,updateData,deleteData;
     int id;
-    private  MainActivity mainActivity;
     public Barang selectedBarang;
     public BarangFragment() {
     }
@@ -49,14 +60,21 @@ public class BarangFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         db = FirebaseDatabase.getInstance().getReference();
-        addData=false;
-        updateData=false;
-        deleteData=false;
         View view = inflater.inflate(R.layout.fragment_barang,container, false);
         ButterKnife.bind(this, view);
+        addMode();
         return view;
     }
-
+    public void updateMode(){
+        btnAdd.setEnabled(false);
+        btnDelete.setEnabled(true);
+        btnUpdate.setEnabled(true);
+    }
+    public void addMode(){
+        btnAdd.setEnabled(true);
+        btnDelete.setEnabled(false);
+        btnUpdate.setEnabled(false);
+    }
     @Override
     public void onStart() {
         super.onStart();
@@ -69,10 +87,9 @@ public class BarangFragment extends Fragment {
             txtHargaBeli.setText(String.valueOf(barang.getHargaBeli()));
             txtStock.setText(String.valueOf(barang.getStock()));
             selectedBarang=barang;
+            updateMode();
         }
     }
-    ///
-
     @OnClick(R.id.btnAdd)
     public void addBarang(){
         id=0;
@@ -108,7 +125,6 @@ public class BarangFragment extends Fragment {
                         txtHargaJual.setText("");
                         txtNamaBarang.setText("");
                         txtStock.setText("");
-                        addData = true;
                         Toast.makeText(getActivity(), "Add Barang Success", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -124,18 +140,17 @@ public class BarangFragment extends Fragment {
             selectedBarang.setNamaBarang(txtNamaBarang.getText().toString());
             selectedBarang.setHargaJual(Integer.valueOf(txtHargaJual.getText().toString()));
             selectedBarang.setHargaBeli(Integer.valueOf(txtHargaBeli.getText().toString()));
-           db.child("Barang").child(selectedBarang.getIdBarang()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+           db.child("Barang").child(selectedBarang.getKey()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
                @Override
                public void onSuccess(Void aVoid) {
                    txtHargaBeli.setText("");
                    txtHargaJual.setText("");
                    txtNamaBarang.setText("");
                    txtStock.setText("");
-                   updateData = true;
                    Toast.makeText(getActivity(), "Update Barang Success", Toast.LENGTH_SHORT).show();
                }
            });
-
+            addMode();
         }
 
     }
@@ -143,17 +158,17 @@ public class BarangFragment extends Fragment {
     public void deleteBarang(){
         if(selectedBarang!=null)
         {
-            db.child("Barang").child(selectedBarang.getIdBarang()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            db.child("Barang").child(selectedBarang.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtHargaBeli.setText("");
                     txtHargaJual.setText("");
                     txtNamaBarang.setText("");
                     txtStock.setText("");
-                    deleteData=true;
                     Toast.makeText(getActivity(), "Delete Barang Success", Toast.LENGTH_SHORT).show();
                 }
             });
+            addMode();
         }
     }
 }

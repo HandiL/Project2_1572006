@@ -35,7 +35,7 @@ public class BarangAdapter extends  RecyclerView.Adapter<BarangAdapter.BarangVie
     public void setBarangs(ArrayList<Barang> barangs) {
         getBarangs().clear();
         getBarangs().addAll(barangs);
-
+        notifyDataSetChanged();
     }
 
     @Override
